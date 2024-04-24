@@ -16,4 +16,3 @@
  скобку, и написать ее самостоятельно (баг десмоса при вставке функций)
  triangle(P[F.x], P[F.y], P[F.z]) -> triangle P[F.x], P[F.y], P[F.z]) -> triangle(P[F.x], P[F.y], P[F.z])
                                                 ↑
-DesmosCopy from http://dmccooey.com/polyhedra
