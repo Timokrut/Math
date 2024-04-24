@@ -53,8 +53,9 @@ def generate_desmos_code(vertices, edges, constants):
     constants_code = "\n".join([f"{c} = {constants[c]}" for c in constants])
 
     vertices_code = ", ".join([f'({vertex[0].replace("C", "C_")}, {vertex[1].replace("C", "C_")}, {vertex[2].replace("C", "C_")})' for vertex in vertices])
+    
+    edges_code = ", ".join([f"({', '.join(str(edge[i] + 1) for i in range(j, j + 3))})" for edge in edges for j in range(len(edge) - 2)])
 
-    edges_code = ", ".join([f"({edge[0]}, {edge[1]}, {edge[2]})" for edge in edges])
 
     desmos_code = f"{constants_code}\nP = [{vertices_code}]\nF = [{edges_code}]\ntriangle (P[F.x], P[F.y], P[F.z])"
     return desmos_code
