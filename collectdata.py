@@ -3,8 +3,6 @@ import requests
 from bs4 import BeautifulSoup as bs
 import pyperclip
 import os
-# HexagonalDipyramid
-
 
 def extract_numbers(string):
     return [int(num) for num in re.findall(r'-?\d+\.?\d*', string)]
@@ -72,9 +70,6 @@ def collect_data(data):
 
     return vertices, faces, Constants
 
-# def analyze_constants(data):
-
-
 def generate_desmos_code(vertices, edges, constants):
     constants_code = "\n".join([f"{c} = {constants[c]}" for c in constants])
 
@@ -82,8 +77,7 @@ def generate_desmos_code(vertices, edges, constants):
     
     edges_code = ", ".join([f"({(edge[0] + 1)}, {str(edge[1] + 1)}, {edge[2] + 1})" for edge in edges])
 
-
-    desmos_code = f"{constants_code}\nP = [{vertices_code}]\nF = [{edges_code}]\ntriangle (P[F.x], P[F.y], P[F.z])"
+    desmos_code = f"{constants_code}\nP = [{vertices_code}]\nF = [{edges_code}]\n\operatorname{{triangle}}(P[F.x],P[F.y],P[F.z])"
     return desmos_code
 
 if __name__ == "__main__":
@@ -92,7 +86,6 @@ if __name__ == "__main__":
         url = f'http://dmccooey.com/polyhedra/{name}.txt'
         page = requests.get(url)
         soup = bs(page.text, 'html.parser')
-
 
         data = page.text.replace('  ', ' ')
 
