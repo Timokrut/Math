@@ -66,7 +66,10 @@ def collect_data(data):
     
     for points in vertices:
         for i in range(len(points)):
-            points[i] = convert_text(points[i])
+            try: 
+                float(points[i])
+            except:
+                points[i] = convert_text(points[i])
 
     return vertices, faces, Constants
 
