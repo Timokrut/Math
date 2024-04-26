@@ -16,6 +16,18 @@ data = page.text
 def extract_numbers(string):
     return [int(num) for num in re.findall(r'-?\d+\.?\d*', string)]
 
+def remake_array(arr):
+    new_arr = []
+    for subarr in arr:
+        if len(subarr) <= 3:
+            new_arr.append(subarr)
+        else:
+            new_subarr = []
+            for i in range(len(subarr) - 2):
+                new_subarr.append([subarr[0], subarr[i+1], subarr[i+2]])
+            new_arr.extend(new_subarr)
+    return new_arr
+
 def collect_data(data):
     i = 0
     Constants = dict()
@@ -49,17 +61,20 @@ def collect_data(data):
 
 vertices, faces, Constants = collect_data(data)
 
+
 def generate_desmos_code(vertices, edges, constants):
     constants_code = "\n".join([f"{c} = {constants[c]}" for c in constants])
 
     vertices_code = ", ".join([f'({vertex[0].replace("C", "C_")}, {vertex[1].replace("C", "C_")}, {vertex[2].replace("C", "C_")})' for vertex in vertices])
     
-    edges_code = ", ".join([f"({', '.join(str(edge[i] + 1) for i in range(j, j + 3))})" for edge in edges for j in range(len(edge) - 2)])
+    edges_code = ", ".join([f"({(edge[0] + 1)}, {str(edge[1] + 1)}, {edge[2] + 1})" for edge in edges])
 
 
     desmos_code = f"{constants_code}\nP = [{vertices_code}]\nF = [{edges_code}]\ntriangle (P[F.x], P[F.y], P[F.z])"
     return desmos_code
 
-desmos_code = generate_desmos_code(vertices, faces, Constants)
+new_edges = remake_array(faces)
+
+desmos_code = generate_desmos_code(vertices, new_edges, Constants)
 pyperclip.copy(desmos_code)
 print("Координаты скопированы в буфер обмена. Зайдите в Desmos и нажмите CTRL + V")
