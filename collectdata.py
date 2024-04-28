@@ -4,10 +4,12 @@ from bs4 import BeautifulSoup as bs
 import pyperclip
 import os
 
-def extract_numbers(string):
+from typing import Dict
+
+def extract_numbers(string: str) -> list[float]:
     return [int(num) for num in re.findall(r'-?\d+\.?\d*', string)]
 
-def remake_array(arr):
+def remake_array(arr: list[list[int]]) -> list[list[int]]:
     new_arr = []
     for subarr in arr:
         if len(subarr) <= 3:
@@ -19,7 +21,7 @@ def remake_array(arr):
             new_arr.extend(new_subarr)
     return new_arr
 
-def convert_text(input_text):
+def convert_text(input_text: str) -> str:
     changed = ['C_{']
     for i in range(0, len(input_text)):
         flag = True
@@ -33,7 +35,7 @@ def convert_text(input_text):
     changed.append('}')
     return "".join(changed)
 
-def collect_data(data):
+def collect_data(data: str):
     i = 0
     Constants = dict()
     while (True):
@@ -73,7 +75,7 @@ def collect_data(data):
 
     return vertices, faces, Constants
 
-def generate_desmos_code(vertices, edges, constants):
+def generate_desmos_code(vertices: list[list[str]], edges: list[list[int]], constants: Dict[str:float]) -> str:
     constants_code = "\n".join([f"{c} = {constants[c]}" for c in constants])
 
     vertices_code = ", ".join([f'({vertex[0]}, {vertex[1]}, {vertex[2]})' for vertex in vertices])
