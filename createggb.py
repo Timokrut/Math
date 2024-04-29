@@ -517,6 +517,31 @@ def add_point(point_name: str, coordinates: list[float]) -> None:
     with open('./ggb_template/ggb_template/geogebra.xml', 'a') as file:
         file.write(content)
     
+    #t1 = Polygon(point, ..., point)
+    #       ↑--------n--------↑
+    #Creates n Segments
+    #v0 = Segment(point2, point3, t1)
+    #v1 = Segment(point3, point0, t1)
+    #v2 = Segment(point0, point2, t1)
+def create_polygon(faces: list[int]):
+    if not hasattr(create_polygon, "counter"):
+        create_polygon.counter = 0
+    create_polygon.counter += 1
+
+    content = f'''<command name="Polygon">
+        <input a0="V{faces[0] - 1}" a1="V{faces[1] - 1}" a2="V{faces[2] - 1}"/>
+        <output a0="t{create_polygon.counter}"/>
+    </command>
+    <element type="polygon3d" label="t{create_polygon.counter}">
+        <lineStyle thickness="5" type="0" typeHidden="1" opacity="204"/>
+        <show object="true" label="false" ev="4"/>
+        <objColor r="21" g="101" b="192" alpha="0.10000000149011612"/>
+        <layer val="0"/>
+        <labelMode val="0"/>
+    </element>
+'''
+    with open('./ggb_template/ggb_template/geogebra.xml', 'a') as file:
+        file.write(content)
 
 if __name__ == "__main__":
     create_template("ggb_template")
@@ -527,6 +552,9 @@ if __name__ == "__main__":
         name = f'V{number}'
         add_point(name, point)
     
+    for face in faces:
+        create_polygon(face)
+
     endfile = '''</construction>
             </geogebra>'''
     with open ('./ggb_template/ggb_template/geogebra.xml', 'a') as file:
