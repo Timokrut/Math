@@ -75,7 +75,7 @@ def collect_data(data: str):
 
     return vertices, faces, Constants
 
-def generate_desmos_code(vertices: list[list[str]], edges: list[list[int]], constants: Dict[str:float]) -> str:
+def generate_desmos_code(vertices: list[list[str]], edges: list[list[int]], constants: Dict[str,float]) -> str:
     constants_code = "\n".join([f"{c} = {constants[c]}" for c in constants])
 
     vertices_code = ", ".join([f'({vertex[0]}, {vertex[1]}, {vertex[2]})' for vertex in vertices])
