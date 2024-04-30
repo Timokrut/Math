@@ -2,7 +2,7 @@ import shutil
 import os
 
 def clear_and_write_file(file_path, content):
-    with open(file_path, 'w') as file:
+    with open(file_path, 'w', encoding='utf-8') as file:
         file.write(content)
 
 def create_template_files(template_folder):
@@ -523,6 +523,7 @@ def add_point(point_name: str, coordinates: list[float]) -> None:
     #v0 = Segment(point2, point3, t1)
     #v1 = Segment(point3, point0, t1)
     #v2 = Segment(point0, point2, t1)
+    
 def create_polygon(faces: list[int]):
     if not hasattr(create_polygon, "counter"):
         create_polygon.counter = 0
@@ -560,6 +561,6 @@ if __name__ == "__main__":
     with open ('./ggb_template/ggb_template/geogebra.xml', 'a') as file:
         file.write(endfile)
     #create .ggb    
-    source_folder = './ggb_template'
+    source_folder = './ggb_template/ggb_template'
     target_rar = 'figure.ggb'
     create_ggb_file(source_folder, target_rar)
