@@ -505,7 +505,7 @@ def add_point(point_name: str, coordinates: list[float]) -> None:
     content = f'''
         <expression label="{point_name}" exp="({coordinates[0]}, {coordinates[1]}, {coordinates[2]})" type="point"/> 
             <element type="point3d" label="{point_name}">
-                <show object="true" label="true" ev="20"/>
+                <show object="true" label="false" ev="20"/>
                 <objColor r="0" g="0" b="0" alpha="0"/>
                 <layer val="0"/>
                 <labelMode val="0"/>
@@ -531,16 +531,46 @@ def create_polygon(faces: list[int]):
 
     content = f'''<command name="Polygon">
         <input a0="V{faces[0] - 1}" a1="V{faces[1] - 1}" a2="V{faces[2] - 1}"/>
-        <output a0="t{create_polygon.counter}"/>
+        <output a0="t{create_polygon.counter}" a1="v{faces[2] - 1}" a2="v{faces[1] - 1}" a3="v{faces[0] - 1}"/>
     </command>
     <element type="polygon3d" label="t{create_polygon.counter}">
         <lineStyle thickness="5" type="0" typeHidden="1" opacity="204"/>
         <show object="true" label="false" ev="4"/>
-        <objColor r="21" g="101" b="192" alpha="0.10000000149011612"/>
+        <objColor r="21" g="101" b="192" alpha="1"/>
         <layer val="0"/>
         <labelMode val="0"/>
     </element>
-'''
+    <element type="segment3d" label="v{faces[2] - 1}">
+        <show object="true" label="false" ev="4"/>
+        <objColor r="21" g="101" b="192" alpha="0"/>
+        <layer val="0"/>
+        <labelMode val="0"/>
+        <auxiliary val="false"/>
+        <lineStyle thickness="0" type="0" typeHidden="1"/>
+        <outlyingIntersections val="false"/>
+        <keepTypeOnTransform val="true"/>
+    </element>
+        <element type="segment3d" label="v{faces[1] - 1}">
+        <show object="true" label="false" ev="4"/>
+        <objColor r="21" g="101" b="192" alpha="0"/>
+        <layer val="0"/>
+        <labelMode val="0"/>
+        <auxiliary val="false"/>
+        <lineStyle thickness="0" type="0" typeHidden="1"/>
+        <outlyingIntersections val="false"/>
+        <keepTypeOnTransform val="true"/>
+    </element>
+    <element type="segment3d" label="v{faces[0] - 1}">
+        <show object="true" label="false" ev="4"/>
+        <objColor r="21" g="101" b="192" alpha="0"/>
+        <layer val="0"/>
+        <labelMode val="0"/>
+        <auxiliary val="false"/>
+        <lineStyle thickness="0" type="0" typeHidden="1"/>
+        <outlyingIntersections val="false"/>
+        <keepTypeOnTransform val="true"/>
+    </element>'''
+
     with open('./ggb_template/ggb_template/geogebra.xml', 'a') as file:
         file.write(content)
 
