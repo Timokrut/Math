@@ -150,72 +150,75 @@ while True:
         settings_window()
 
     if len(values[0]) > 0:
-        save_folder_path(folder_path)
-        if event == 'Создать GGB файл (Geogebra)':
-            try:
-                create_template(os.path.join(folder_path, f'{values[0]}_ggb_template'))
-
+        if len(folder_path) > 0:
+            save_folder_path(folder_path)
+            if event == 'Создать GGB файл (Geogebra)':
                 try:
-                    verticies, faces = read_obj_file(os.path.join(folder_path, f'{values[0]}.obj'))
-                except:
-                    create_obj(os.path.join(folder_path, f"{values[0]}.obj"))
-                    verticies, faces = read_obj_file(os.path.join(folder_path, f'{values[0]}.obj'))
+                    create_template(os.path.join(folder_path, f'{values[0]}_ggb_template'))
 
-                for number, point in enumerate(verticies):
-                    name = f'V{number}'
-                    add_point(name, point, os.path.join(folder_path, f'{values[0]}_ggb_template/ggb_template/geogebra.xml'))
+                    try:
+                        verticies, faces = read_obj_file(os.path.join(folder_path, f'{values[0]}.obj'))
+                    except:
+                        create_obj(os.path.join(folder_path, f"{values[0]}.obj"))
+                        verticies, faces = read_obj_file(os.path.join(folder_path, f'{values[0]}.obj'))
 
-                for face in faces:
-                    create_polygon(face, os.path.join(folder_path, f'{values[0]}_ggb_template/ggb_template/geogebra.xml'))
+                    for number, point in enumerate(verticies):
+                        name = f'V{number}'
+                        add_point(name, point, os.path.join(folder_path, f'{values[0]}_ggb_template/ggb_template/geogebra.xml'))
 
-                endfile = '''</construction>
-                </geogebra>'''
-        
-                with open (os.path.join(folder_path, f'{values[0]}_ggb_template/ggb_template/geogebra.xml'), 'a') as file:
-                    file.write(endfile)
+                    for face in faces:
+                        create_polygon(face, os.path.join(folder_path, f'{values[0]}_ggb_template/ggb_template/geogebra.xml'))
 
-                source_folder = os.path.join(folder_path, f'{values[0]}_ggb_template/ggb_template')
-                target_rar = os.path.join(folder_path, f'{values[0]}.ggb')
+                    endfile = '''</construction>
+                    </geogebra>'''
+            
+                    with open (os.path.join(folder_path, f'{values[0]}_ggb_template/ggb_template/geogebra.xml'), 'a') as file:
+                        file.write(endfile)
 
-                if os.path.exists(os.path.join(folder_path, f"{values[0]}.ggb")):
-                    os.remove(os.path.join(folder_path, f"{values[0]}.ggb"))
-                
-                create_ggb_file(source_folder, target_rar)
-                
-                os.remove(os.path.join(folder_path, f"{values[0]}.obj"))
-                shutil.rmtree(os.path.join(folder_path, f'{values[0]}_ggb_template'))
+                    source_folder = os.path.join(folder_path, f'{values[0]}_ggb_template/ggb_template')
+                    target_rar = os.path.join(folder_path, f'{values[0]}.ggb')
 
-                print('Файл GGB успешно создан')
+                    if os.path.exists(os.path.join(folder_path, f"{values[0]}.ggb")):
+                        os.remove(os.path.join(folder_path, f"{values[0]}.ggb"))
+                    
+                    create_ggb_file(source_folder, target_rar)
+                    
+                    os.remove(os.path.join(folder_path, f"{values[0]}.obj"))
+                    shutil.rmtree(os.path.join(folder_path, f'{values[0]}_ggb_template'))
 
-            except Exception as e:
-                print(e)    
+                    print('Файл GGB успешно создан')
 
-        if event == 'Сгенерировать текст для Desmos':
-            try:
-                url = f'http://dmccooey.com/polyhedra/{values[0]}.txt'
-                page = requests.get(url)
-                soup = bs(page.text, 'html.parser')
-                data = page.text.replace('  ', ' ')
-                vertices, faces, Constants = collect_data(data)
-                new_edges = remake_array(faces)
-                desmos_code = generate_desmos_code(vertices, new_edges, Constants)
-                pyperclip.copy(desmos_code)
-                print(f"Координаты {values[0]} скопированы в буфер обмена. Зайдите в Desmos и нажмите CTRL + V")
-            except Exception as e:
-                print(e)    
+                except Exception as e:
+                    print(e)    
 
-        if event == 'Создать OBJ файл (Blender, etc)':
-            try:
+            if event == 'Сгенерировать текст для Desmos':
                 try:
-                    os.makedirs(os.path.join(folder_path, 'obj'))
-                except:
-                    pass
+                    url = f'http://dmccooey.com/polyhedra/{values[0]}.txt'
+                    page = requests.get(url)
+                    soup = bs(page.text, 'html.parser')
+                    data = page.text.replace('  ', ' ')
+                    vertices, faces, Constants = collect_data(data)
+                    new_edges = remake_array(faces)
+                    desmos_code = generate_desmos_code(vertices, new_edges, Constants)
+                    pyperclip.copy(desmos_code)
+                    print(f"Координаты {values[0]} скопированы в буфер обмена. Зайдите в Desmos и нажмите CTRL + V")
+                except Exception as e:
+                    print(e)    
 
-                create_obj(os.path.join(folder_path, f"obj/{values[0]}.obj"))
-                print(f"Object файл для {values[0]} создан")
+            if event == 'Создать OBJ файл (Blender, etc)':
+                try:
+                    try:
+                        os.makedirs(os.path.join(folder_path, 'obj'))
+                    except:
+                        pass
 
-            except Exception as e:
-                print(e)    
+                    create_obj(os.path.join(folder_path, f"obj/{values[0]}.obj"))
+                    print(f"Object файл для {values[0]} создан")
+
+                except Exception as e:
+                    print(e)    
+        else:
+            print('Укажите путь')            
     else:
         print('Сначала напишите название фигуры')           
 
