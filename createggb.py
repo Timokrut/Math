@@ -1,5 +1,15 @@
+import     os
+import   json
 import shutil
-import os
+
+
+def load_settings():
+    settings_file = "settings.json"
+    try:
+        with open(settings_file, "r") as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return None                
 
 def clear_and_write_file(file_path, content):
     with open(file_path, 'w', encoding='utf-8') as file:
@@ -501,20 +511,22 @@ def read_obj_file(file_path):
                 faces.append([int(x.split('/')[0]) for x in line.strip().split()[1:]])
     return vertices, faces
 
-def add_point(point_name: str, coordinates: list[float]) -> None:
+def add_point(point_name: str, coordinates: list[float], path: str) -> None:
+    settings = load_settings()
+
     content = f'''
         <expression label="{point_name}" exp="({coordinates[0]}, {coordinates[1]}, {coordinates[2]})" type="point"/> 
             <element type="point3d" label="{point_name}">
-                <show object="true" label="false" ev="20"/>
-                <objColor r="0" g="0" b="0" alpha="0"/>
+                <show object="true" label="{str(settings['Point']['label']).lower()}" ev="20"/>
+                <objColor r="{settings['Point']['color']['r']}" g="{settings['Point']['color']['g']}" b="{settings['Point']['color']['b']}" alpha="{settings['Point']['alpha']}"/>
                 <layer val="0"/>
                 <labelMode val="0"/>
                 <fixed val="true"/>
-                <pointSize val="5"/>
+                <pointSize val="{settings['Point']['pointSize']}"/>
                 <coords x="{coordinates[0]}" y="{coordinates[1]}" z="{coordinates[2]}" w="1"/>
             </element>  
         '''
-    with open('./ggb_template/ggb_template/geogebra.xml', 'a') as file:
+    with open(path, 'a') as file:
         file.write(content)
     
     #t1 = Polygon(point, ..., point)
@@ -524,54 +536,54 @@ def add_point(point_name: str, coordinates: list[float]) -> None:
     #v1 = Segment(point3, point0, t1)
     #v2 = Segment(point0, point2, t1)
     
-def create_polygon(faces: list[int]):
+def create_polygon(faces: list[int], path: str):
     if not hasattr(create_polygon, "counter"):
         create_polygon.counter = 0
     create_polygon.counter += 1
-
+    settings = load_settings()
     content = f'''<command name="Polygon">
         <input a0="V{faces[0] - 1}" a1="V{faces[1] - 1}" a2="V{faces[2] - 1}"/>
         <output a0="t{create_polygon.counter}" a1="v{faces[2] - 1}" a2="v{faces[1] - 1}" a3="v{faces[0] - 1}"/>
     </command>
     <element type="polygon3d" label="t{create_polygon.counter}">
         <lineStyle thickness="5" type="0" typeHidden="1" opacity="204"/>
-        <show object="true" label="false" ev="4"/>
-        <objColor r="21" g="101" b="192" alpha="1"/>
+        <show object="true" label="{settings['Polygon']['label']}" ev="4"/>
+        <objColor r="{settings['Polygon']['color']['r']}" g="{settings['Polygon']['color']['g']}" b="{settings['Polygon']['color']['b']}" alpha="{settings['Polygon']['alpha']}"/>
         <layer val="0"/>
         <labelMode val="0"/>
     </element>
     <element type="segment3d" label="v{faces[2] - 1}">
-        <show object="true" label="false" ev="4"/>
-        <objColor r="21" g="101" b="192" alpha="0"/>
+        <show object="{str(settings['Segment']['show_object']).lower()}" label="{str(settings['Segment']['label']).lower()}" ev="4"/>
+        <objColor r="{settings['Segment']['color']['r']}" g="{settings['Segment']['color']['g']}" b="{{settings['Segment']['color']['b']}}" alpha="{settings['Segment']['alpha']}"/>
         <layer val="0"/>
         <labelMode val="0"/>
         <auxiliary val="false"/>
-        <lineStyle thickness="0" type="0" typeHidden="1"/>
+        <lineStyle thickness="{settings['Segment']['thickness']}" type="0" typeHidden="1"/>
         <outlyingIntersections val="false"/>
         <keepTypeOnTransform val="true"/>
     </element>
         <element type="segment3d" label="v{faces[1] - 1}">
-        <show object="true" label="false" ev="4"/>
-        <objColor r="21" g="101" b="192" alpha="0"/>
+        <show object="{str(settings['Segment']['show_object']).lower()}" label="{str(settings['Segment']['label']).lower()}" ev="4"/>
+        <objColor r="{settings['Segment']['color']['r']}" g="{settings['Segment']['color']['g']}" b="{{settings['Segment']['color']['b']}}" alpha="{settings['Segment']['alpha']}"/>
         <layer val="0"/>
         <labelMode val="0"/>
         <auxiliary val="false"/>
-        <lineStyle thickness="0" type="0" typeHidden="1"/>
+        <lineStyle thickness="{settings['Segment']['thickness']}" type="0" typeHidden="1"/>
         <outlyingIntersections val="false"/>
         <keepTypeOnTransform val="true"/>
     </element>
     <element type="segment3d" label="v{faces[0] - 1}">
-        <show object="true" label="false" ev="4"/>
-        <objColor r="21" g="101" b="192" alpha="0"/>
+        <show object="{str(settings['Segment']['show_object']).lower()}" label="{str(settings['Segment']['label']).lower()}" ev="4"/>
+        <objColor r="{settings['Segment']['color']['r']}" g="{settings['Segment']['color']['g']}" b="{{settings['Segment']['color']['b']}}" alpha="{settings['Segment']['alpha']}"/>
         <layer val="0"/>
         <labelMode val="0"/>
         <auxiliary val="false"/>
-        <lineStyle thickness="0" type="0" typeHidden="1"/>
+        <lineStyle thickness="{settings['Segment']['thickness']}" type="0" typeHidden="1"/>
         <outlyingIntersections val="false"/>
         <keepTypeOnTransform val="true"/>
     </element>'''
 
-    with open('./ggb_template/ggb_template/geogebra.xml', 'a') as file:
+    with open(path, 'a') as file:
         file.write(content)
 
 if __name__ == "__main__":
@@ -581,10 +593,10 @@ if __name__ == "__main__":
 
     for number, point in enumerate(verticies):
         name = f'V{number}'
-        add_point(name, point)
+        add_point(name, point, './ggb_template/ggb_template/geogebra.xml')
     
     for face in faces:
-        create_polygon(face)
+        create_polygon(face, './ggb_template/ggb_template/geogebra.xml')
 
     endfile = '''</construction>
             </geogebra>'''
