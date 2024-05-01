@@ -25,28 +25,31 @@ def load_settings():
         with open(settings_file, "r") as file:
             return json.load(file)
     except FileNotFoundError:
-        return {
-    "Polygon": {
-      "color": {"r": 21, "g": 101, "b": 192},
-      "alpha": 1,
-      "label": False
-    },
+        default_settings = {
+            "Polygon": {
+                "color": {"r": 21, "g": 101, "b": 192},
+                "alpha": 1,
+                "label": False
+            },
 
-    "Segment": {
-      "color": {"r": 21, "g": 101, "b": 192},
-      "alpha": 0,
-      "thickness": 0,
-      "show_object": True,
-      "label": False
-    },
+            "Segment": {
+                "color": {"r": 21, "g": 101, "b": 192},
+                "alpha": 0,
+                "thickness": 0,
+                "show_object": True,
+                "label": False
+            },
 
-    "Point": {
-      "color": {"r": 0, "g": 0, "b": 0},
-      "alpha": 0,
-      "pointSize": 5,
-      "label": False
-    }
-}               
+            "Point": {
+                "color": {"r": 0, "g": 0, "b": 0},
+                "alpha": 0,
+                "pointSize": 5,
+                "label": False
+            }
+        }
+        with open(settings_file, "w") as file:
+            json.dump(default_settings, file, indent=4)
+        return default_settings             
 
 def save_folder_path(folder_path):
     config = {"folder_path" : folder_path}
