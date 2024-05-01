@@ -25,7 +25,28 @@ def load_settings():
         with open(settings_file, "r") as file:
             return json.load(file)
     except FileNotFoundError:
-        return None                
+        return {
+    "Polygon": {
+      "color": {"r": 21, "g": 101, "b": 192},
+      "alpha": 1,
+      "label": False
+    },
+
+    "Segment": {
+      "color": {"r": 21, "g": 101, "b": 192},
+      "alpha": 0,
+      "thickness": 0,
+      "show_object": True,
+      "label": False
+    },
+
+    "Point": {
+      "color": {"r": 0, "g": 0, "b": 0},
+      "alpha": 0,
+      "pointSize": 5,
+      "label": False
+    }
+}               
 
 def save_folder_path(folder_path):
     config = {"folder_path" : folder_path}
@@ -38,7 +59,7 @@ def get_default_folder_path():
             config = json.load(file)
             return config.get("folder_path", "")
     return ""
-    
+
 def create_obj(path) -> None:
     url = f'http://dmccooey.com/polyhedra/{values[0]}.txt'
     page = requests.get(url)
