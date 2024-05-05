@@ -8,6 +8,7 @@
 
 Шаг второй: Написать название фигуры (Без пробелов!)
 (Лучше всего взять из поисковой строки например: http://dmccooey.com/polyhedra/GeodesicCube15.html -> отсюда берем GeodesicCube15)
+(CTRL + V может не работать на русской раскладке)
 
 ![alt text](readme_photo/image-1.png)
 
