@@ -15,8 +15,22 @@ def count_solution(point_A: list[float], point_B: list[float], point_C: list[flo
     eq1 = Eq((x - point_D[0])**2 + (y - point_D[1])**2, distance(point_A, point_C)**2)
     eq2 = Eq((x - point_E[0])**2 + (y - point_E[1])**2, distance(point_B, point_C)**2)
     sol_dict = solve((eq1,eq2), (x, y))
+    # print(f' (x - {point_D[0]})^2 + (y - {point_D[1]})^2 = distance ({point_A}, {point_C})^2 // {distance(point_A, point_C)}^2 ')
+    # print(f' (x - {point_E[0]})^2 + (y - {point_E[1]})^2 = distance ({point_B}, {point_C})^2 // {distance(point_B, point_C)}^2 ')
 
-    return list(max(sol_dict[0], sol_dict[1]))
+    # print()
+    
+    solution = sol_dict[1] if sol_dict[1][0] > sol_dict[0][0] else sol_dict[0]
+
+    # print(f'solution 1 - {sol_dict[0]}')
+    # print(f'solution 2 - {sol_dict[1]}')
+    # print(f'pick - {list(solution) if solution in I else list(sol_dict[0] if sol_dict[0] in I else sol_dict[1])}')
+    # print()
+        
+
+
+    return list(solution) if solution in I else list(sol_dict[0] if sol_dict[0] in I else sol_dict[1])
+
 
 def find_sim(face_A: list[int], face_B: list[int]):
     counter = 0
@@ -70,18 +84,18 @@ if __name__ == '__main__':
     for counter in range(len(F)):
         vericies, good_verticies = point_max_comp(F, counter)
         for count, good_point in enumerate(good_verticies):
-            print(f'good point - {good_point}')
-            print(f'find_num_0 - {find_number(medical_aid, good_point[0])}')
-            print(f'find_num_1 - {find_number(medical_aid, good_point[1])}')
+            # print(f'good point - {good_point}')
+            # print(f'find_num_0 - {find_number(medical_aid, good_point[0])}')
+            # print(f'find_num_1 - {find_number(medical_aid, good_point[1])}')
 
-            I.append(count_solution(F[good_point[0]], F[good_point[1]], F[vericies[count]], find_number(medical_aid, good_point[0]), find_number(medical_aid, good_point[1]), I))
+            I.append(count_solution(Verticies[good_point[0]], Verticies[good_point[1]], Verticies[vericies[count]], find_number(medical_aid, good_point[0]), find_number(medical_aid, good_point[1]), I))
             
             medical_aid[vericies[count]] = I[-1]
             
-            print(I)
-            print(f'verticies - {vericies}')
+            # print(I)
+            # print(f'verticies - {vericies}')
             
-            print(f'medical aid - {medical_aid}')
+            # print(f'medical aid - {medical_aid}')
 
-            print()
-            print()
+            # print()
+            # print()
