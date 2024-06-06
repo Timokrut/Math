@@ -3,22 +3,25 @@ from bs4 import BeautifulSoup as bs
 import re
 from collectdata import remake_array, extract_numbers, convert_text
 from shape_scan import count_solution, distance, find_sim, point_max_comp, find_number
+from sympy import S
 
+from fromat import format
 
 def collect_data(data: str):
     i = 0
     Constants = dict()
     while (True):
-        patternC = rf'C{i} = ([\d\.]+)'
+        patternC = rf'C{i} = ([\d\.]+) = (.+)'
         value = re.search(patternC, data)
-
+        print(value)
         if value:
-            Constants["C_{" + str(i) + "}"] = round(float(value.group(1)), 6)
-            Constants["-C_{" + str(i) + "}"] = round(float(value.group(1)) * -1, 6)
+            Constants["C_{" + str(i) + "}"] = ((value.group(2)))
+            Constants["-C_{" + str(i) + "}"] = (('-' + value.group(2)))
             i += 1
         else:
             break
-
+        # 'C1 = ([\\d\\.]+) = (.+)'
+    print(Constants)
     j = 0
     vertices = []
     while (True):
@@ -43,7 +46,7 @@ def collect_data(data: str):
             try: 
                 round(float(points[i]), 6)
             except ValueError:
-                points[i] = Constants[convert_text(points[i])]
+                points[i] =  S(Constants[convert_text(points[i])])
     return vertices, faces, Constants
 
 from typing import Dict
@@ -142,12 +145,13 @@ def check_solution(faces: list[int], face_check: list[int], vertices: list[float
 if __name__ == '__main__':
 
     # name = input('Напишите название фигуры(как нас сайте): ')
-    name = 'Octahedron'
+    name = 'Tetrahedron'
     url = f'http://dmccooey.com/polyhedra/{name}.txt'
     page = requests.get(url)
     soup = bs(page.text, 'html.parser')
-
-    data = page.text.replace('  ', ' ')
+    data = page.text
+    for i in range(20):
+        data = data.replace('  ', ' ')
 
     vertices, faces, Constants = collect_data(data)
 
@@ -156,6 +160,7 @@ if __name__ == '__main__':
     new_edges = remake_array(faces)
     print(new_edges)
     amount_of_verticies = {}
+
 
     for i in vertices:
         amount_of_verticies[vertices.index(i)] = 0
@@ -199,5 +204,5 @@ if __name__ == '__main__':
 
            # check_solution(faces, face_check, vertices, good_point, I, amount_of_verticies, verts[count], compare_numb_to_I)
 
-    print(I)
+    print(format(str(I)))
     print(compare_numb_to_I)

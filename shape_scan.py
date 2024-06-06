@@ -1,10 +1,7 @@
-from sympy import symbols, Eq, solve
+from sympy import symbols, Eq, solve, sqrt
 
 def distance(point_A: list[float], point_B: list[float]) -> float:
-    try:
-        return round(((float(point_A[0]) - float(point_B[0]))**2 + (float(point_A[1]) - float(point_B[1]))**2 + (float(point_A[2]) - float(point_B[2]))**2)**0.5, 4)
-    except:
-        return 0
+    return sqrt((point_A[0] - point_B[0])**2 + (point_A[1] - point_B[1])**2 + (point_A[2] - point_B[2])**2)
 
 #                  A - V0                B - V2                V - 4                 I[len(I) - 2]         I[len(I) - 1]
 def count_solution(point_A: list[float], point_B: list[float], point_C: list[float], point_D: list[float], point_E: list[float]) -> None:
