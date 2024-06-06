@@ -29,21 +29,23 @@ def point_max_comp(faces, counter):
     solutions = []
     good_vericies = []
     for j in faces[faces.index(i):]:
-        if i != j:
+        if i != j: 
             if find_sim(i, j) == 2:
+                a = 0
+                b = 0
                 tmp_i = sorted(i)
                 tmp_j = sorted(j)
                 flag = True
-                for k in range(3):
-                    if  tmp_i[k] != tmp_j[k]:
-                        solutions.append(tmp_j[k])
-                    else:
-                        if flag == True:
-                            a = tmp_j[k]
+                for q in tmp_j:
+                    if q in tmp_i:
+                        if flag:
+                            a = q
                             flag = False
                         else:
-                            b = tmp_j[k]
-                            good_vericies.append([a, b])
+                            b = q
+                    else:
+                        solutions.append(q)
+                good_vericies.append([a,b])
 
     return solutions, good_vericies
 
