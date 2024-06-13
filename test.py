@@ -1,19 +1,25 @@
-import requests
-from bs4 import BeautifulSoup as bs
 import re
-from collectdata import remake_array, extract_numbers, convert_text
-from shape_scan import count_solution, distance, find_sim, point_max_comp, find_number
-from sympy import S
+import matplotlib.pylab
+import matplotlib.pyplot  as plt
+import pandas             as pd
+import requests
 
-from fromat import format
+from   bs4    import BeautifulSoup as bs
+from   sympy  import S
+from   typing import Dict
 
-def collect_data(data: str):
+from   collectdata import remake_array, extract_numbers, convert_text
+from   shape_scan  import count_solution, distance, find_sim, point_max_comp
+from   fromat      import format
+
+
+def custom_collect_data(data: str):
     i = 0
     Constants = dict()
     while (True):
         patternC = rf'C{i} = ([\d\.]+) = (.+)'
         value = re.search(patternC, data)
-        print(value)
+        # print(value)
         if value:
             Constants["C_{" + str(i) + "}"] = ((value.group(2)))
             Constants["-C_{" + str(i) + "}"] = (('-' + value.group(2)))
@@ -21,7 +27,7 @@ def collect_data(data: str):
         else:
             break
         # 'C1 = ([\\d\\.]+) = (.+)'
-    print(Constants)
+    # print(Constants)
     j = 0
     vertices = []
     while (True):
@@ -41,7 +47,7 @@ def collect_data(data: str):
             faces.append(extract_numbers(line))
     
     for points in vertices:
-        print(points)
+        # print(points)
         for i in range(len(points)):
             try: 
                 round(float(points[i]), 6)
@@ -49,9 +55,8 @@ def collect_data(data: str):
                 points[i] =  S(Constants[convert_text(points[i])])
     return vertices, faces, Constants
 
-from typing import Dict
 
-def check_solution(faces: list[int], face_check: list[int], vertices: list[float], good_verts: list[int], I: list[float], amount_of_verticies: Dict[int,int], number_of_vertice: int, compare_numb_to_I: list[int]) -> int:
+def check_solution(faces: list[int], face_check: list[int], vertices: list[float], good_verts: list[int], I: list[float], amount_of_verticies: Dict[int,int], number_of_vertice: int, compare_numb_to_I: list[int], first_face) -> int:
     if number_of_vertice in first_face and amount_of_verticies[number_of_vertice] > 0:
         return -1
     
@@ -153,12 +158,12 @@ if __name__ == '__main__':
     for i in range(20):
         data = data.replace('  ', ' ')
 
-    vertices, faces, Constants = collect_data(data)
+    vertices, faces, Constants = custom_collect_data(data)
 
     first_face = faces[0]
 
     new_edges = remake_array(faces)
-    print(new_edges)
+    # print(new_edges)
     amount_of_verticies = {}
 
 
@@ -204,5 +209,17 @@ if __name__ == '__main__':
 
            # check_solution(faces, face_check, vertices, good_point, I, amount_of_verticies, verts[count], compare_numb_to_I)
 
-    print(format(str(I)))
-    print(compare_numb_to_I)
+    # print(format(str(I)))
+    # print(compare_numb_to_I)
+    
+    datacopy2d = [[i[0], i[1]] for i in I]
+    # print(I)
+    # print(datacopy2d)
+
+    df = pd.DataFrame(datacopy2d, columns=['x', 'y'])
+    ax1 = df.plot.scatter(x = 'x', y = 'y', s=30)
+    ax1.grid(True)
+    ax1.set_title(f'Развертка figure')
+    
+    
+    plt.show()

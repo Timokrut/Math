@@ -1,15 +1,22 @@
-import PySimpleGUI as sg
+import PySimpleGUI       as sg
 from bs4 import BeautifulSoup as bs
 
-import        os
-import      json
-import    shutil
-import  requests
-import pyperclip
+import           os
+import         json
+import       shutil
+import     requests
+import    threading
+import    pyperclip
+import   webbrowser
+import  http.server
+import socketserver
 
+from test        import custom_collect_data, check_solution
 from createobj   import write_obj_file,  remake_vertices
-from collectdata import remake_array,    collect_data,    generate_desmos_code
 from createggb   import create_template, create_ggb_file, read_obj_file,       add_point, create_polygon
+from shape_scan  import distance, point_max_comp
+from collectdata import remake_array,    collect_data,    generate_desmos_code
+
 
 sg.theme('DarkGrey9')
 
@@ -81,6 +88,7 @@ layout = [
     [sg.Button('Сгенерировать текст для Desmos')],
     [sg.Button('Создать GGB файл (Geogebra)'), sg.Button('Настройки')],
     [sg.Button('Создать OBJ файл (Blender, etc)')],
+    [sg.Button('Создать развертку в Desmos (alpha)'), sg.Button('Получить координаты развертки')],
     [sg.Text('Выберите папку для сохранения файлов:'), sg.InputText(default_text=default_folder, key='folder_path'), sg.FolderBrowse()],
     [sg.Output(size=(70, 15))]
 ]
@@ -159,6 +167,38 @@ def settings_window():
             sg.popup("Settings restored!")
 
     settings_window.close()
+
+def start_server():
+    global httpd, server_running
+    PORT = 8000
+    Handler = http.server.SimpleHTTPRequestHandler
+    with socketserver.TCPServer(("", PORT), Handler) as httpd:
+        server_running = True
+        httpd.serve_forever()
+        server_running = False
+
+def stop_server():
+    global httpd, server_running
+    if server_running and httpd:
+        httpd.shutdown()
+        server_running = False
+
+def run_server():
+    global server_thread
+    if not server_running:
+        server_thread = threading.Thread(target=start_server)
+        server_thread.start()
+
+def handle_server_start_stop():
+    global server_running
+    if not server_running:
+        run_server()
+    else:
+        stop_server()
+
+# Server globals
+server_running = False
+httpd = None
 
 window = sg.Window("Desmos&Geogebra helper by Timokrut", layout)
 
@@ -240,7 +280,141 @@ while True:
                     print(f"Object файл для {values[0]} создан")
 
                 except Exception as e:
-                    print(e)    
+                    print(e)  
+            
+            if event == 'Создать развертку в Desmos (alpha)':
+                try:
+                    url = f'http://dmccooey.com/polyhedra/{values[0]}.txt'
+                    page = requests.get(url)
+                    soup = bs(page.text, 'html.parser')
+                    data = page.text
+                    for i in range(20):
+                        data = data.replace('  ', ' ')
+                    vertices, faces, Constants = custom_collect_data(data)
+
+                    first_face = faces[0]
+                    
+                    new_edges = remake_array(faces)
+
+                    amount_of_verticies = {}
+
+
+                    for i in vertices:
+                        amount_of_verticies[vertices.index(i)] = 0
+                    for i in first_face[:2]:
+                        amount_of_verticies[i] += 1
+                    for i in range(len(vertices)):
+                        for k in range(3):
+                            vertices[i][k] = float(vertices[i][k])*2
+
+                    I = [[0, 0, 0]]
+                    compare_numb_to_I = [i for i in first_face[:2]]
+
+                    I.append([0, distance(vertices[compare_numb_to_I[0]], vertices[compare_numb_to_I[1]]), 0])
+
+                    face_check = [faces[0] for i in compare_numb_to_I]
+                    
+                    check_solution(faces, face_check, vertices, [0, 1], I, amount_of_verticies, first_face[2], compare_numb_to_I, first_face)
+
+                    for counter in range(len(new_edges)):
+                        verts, good_verticies = point_max_comp(new_edges, counter)
+                        for count, good_point in enumerate(good_verticies):
+                            idx_0 = []
+
+                            for i in range(len(compare_numb_to_I)):
+                                if compare_numb_to_I[i] == good_point[0]:
+                                    idx_0.append(i)
+                            
+                            idx_1 = []                    
+
+                            for i in range(len(compare_numb_to_I)):
+                                if compare_numb_to_I[i] == good_point[1]:
+                                    idx_1.append(i)
+
+                            flag = True
+                            for i in idx_0:
+                                if flag == False:
+                                    break
+                                for j in idx_1:
+                                    if flag and check_solution(faces, face_check, vertices, [i, j], I, amount_of_verticies, verts[count], compare_numb_to_I, first_face) == 0:
+                                        flag = False
+                                        break
+                    datacopy2d = [[i[0], i[1]] for i in I]
+
+                    coordinates = [[str(x), str(y)] for x, y in datacopy2d]
+
+                    with open('coordinates.json', 'w') as f:
+                        json.dump(coordinates, f) 
+ 
+                    webbrowser.open('http://localhost:8000/index.html')
+                    handle_server_start_stop()
+
+                    
+
+                except Exception as e:
+                    print(e)
+            if event == 'Получить координаты развертки':
+                try:
+                    url = f'http://dmccooey.com/polyhedra/{values[0]}.txt'
+                    page = requests.get(url)
+                    soup = bs(page.text, 'html.parser')
+                    data = page.text
+                    for i in range(20):
+                        data = data.replace('  ', ' ')
+                    vertices, faces, Constants = custom_collect_data(data)
+
+                    first_face = faces[0]
+                    
+                    new_edges = remake_array(faces)
+
+                    amount_of_verticies = {}
+
+
+                    for i in vertices:
+                        amount_of_verticies[vertices.index(i)] = 0
+                    for i in first_face[:2]:
+                        amount_of_verticies[i] += 1
+                    for i in range(len(vertices)):
+                        for k in range(3):
+                            vertices[i][k] = float(vertices[i][k])*2
+
+                    I = [[0, 0, 0]]
+                    compare_numb_to_I = [i for i in first_face[:2]]
+
+                    I.append([0, distance(vertices[compare_numb_to_I[0]], vertices[compare_numb_to_I[1]]), 0])
+
+                    face_check = [faces[0] for i in compare_numb_to_I]
+                    
+                    check_solution(faces, face_check, vertices, [0, 1], I, amount_of_verticies, first_face[2], compare_numb_to_I, first_face)
+
+                    for counter in range(len(new_edges)):
+                        verts, good_verticies = point_max_comp(new_edges, counter)
+                        for count, good_point in enumerate(good_verticies):
+                            idx_0 = []
+
+                            for i in range(len(compare_numb_to_I)):
+                                if compare_numb_to_I[i] == good_point[0]:
+                                    idx_0.append(i)
+                            
+                            idx_1 = []                    
+
+                            for i in range(len(compare_numb_to_I)):
+                                if compare_numb_to_I[i] == good_point[1]:
+                                    idx_1.append(i)
+
+                            flag = True
+                            for i in idx_0:
+                                if flag == False:
+                                    break
+                                for j in idx_1:
+                                    if flag and check_solution(faces, face_check, vertices, [i, j], I, amount_of_verticies, verts[count], compare_numb_to_I, first_face) == 0:
+                                        flag = False
+                                        break
+
+                    datacopy2d = [[i[0], i[1]] for i in I]
+                    print(f'Координаты: {datacopy2d}')
+                except Exception as e:
+                    print(e)
         else:
             print('Укажите путь')            
     else:
