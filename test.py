@@ -1,5 +1,4 @@
 import re
-import matplotlib.pyplot  as plt
 import pandas             as pd
 import requests
 
@@ -220,4 +219,3 @@ if __name__ == '__main__':
     ax1.set_title(f'Развертка figure')
     
     
-    plt.show()
