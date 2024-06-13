@@ -1,5 +1,4 @@
 import re
-import matplotlib.pylab
 import matplotlib.pyplot  as plt
 import pandas             as pd
 import requests
@@ -10,7 +9,6 @@ from   typing import Dict
 
 from   collectdata import remake_array, extract_numbers, convert_text
 from   shape_scan  import count_solution, distance, find_sim, point_max_comp
-from   fromat      import format
 
 
 def custom_collect_data(data: str):

@@ -12,10 +12,10 @@ import  http.server
 import socketserver
 
 from test        import custom_collect_data, check_solution
-from createobj   import write_obj_file,  remake_vertices
-from createggb   import create_template, create_ggb_file, read_obj_file,       add_point, create_polygon
+from createobj   import write_obj_file, remake_vertices
+from createggb   import create_template, create_ggb_file, read_obj_file, add_point, create_polygon
 from shape_scan  import distance, point_max_comp
-from collectdata import remake_array,    collect_data,    generate_desmos_code
+from collectdata import remake_array, collect_data, generate_desmos_code
 
 
 sg.theme('DarkGrey9')
